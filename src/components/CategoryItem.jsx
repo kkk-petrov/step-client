@@ -2,22 +2,49 @@ import styled from "styled-components";
 import { mobile } from "../responsive";
 import { NavLink } from "react-router-dom";
 
-const Container = styled.div`
-	flex: 1;
-	margin: 3px;
-	height: 70vh;
-	position: relative;
-`;
-
 const Image = styled.img`
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
+	transition: all 0.5s ease-out;
 
 	${mobile({
 		height: "20vh",
 	})}
 `;
+
+const Background = styled.div`
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	z-index: 1;
+	background-color: #000;
+	width: 100%;
+	height: 150px;
+
+	opacity: 0.6;
+	transition: all 0.3s ease;
+`;
+
+const Container = styled.div`
+	flex: 1;
+	margin: 3px;
+	height: 70vh;
+	position: relative;
+	cursor: pointer;
+	overflow: hidden;
+	&:hover ${Image} {
+		transform: scale(1.2);
+		filter: blur(5px);
+	}
+
+	&:hover ${Background} {
+		opacity: 0.8;
+		/* height: 100%; */
+		/* height: 150px; */
+	}
+`;
+
 const Info = styled.div`
 	position: absolute;
 	top: 0;
@@ -36,16 +63,7 @@ const Title = styled.h1`
 	color: #fff;
 	/* border: 1px solid #222222; */
 `;
-const Background = styled.div`
-	position: absolute;
-	top: 50%;
-	transform: translateY(-50%);
-	z-index: 1;
-	background-color: #000;
-	width: 100%;
-	height: 150px;
-	opacity: 0.6;
-`;
+
 const Logo = styled.img`
 	position: relative;
 	z-index: 2;

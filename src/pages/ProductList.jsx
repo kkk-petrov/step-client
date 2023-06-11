@@ -49,7 +49,9 @@ const Option = styled.option``;
 
 const ProductList = () => {
 	const location = useLocation();
+	const searchParams = new URLSearchParams(location.search);
 	const category = location.pathname.split("/")[2] || "";
+	const searchTerm = searchParams.get("search") || "";
 	const [filters, setFilters] = useState({});
 	const [sort, setSort] = useState("newest");
 
@@ -101,8 +103,12 @@ const ProductList = () => {
 					</Select>
 				</Filter>
 			</FilterContainer>
-			<Products category={category} filters={filters} sort={sort} />
-			<Newsletter />
+			<Products
+				searchTerm={searchTerm}
+				category={category}
+				filters={filters}
+				sort={sort}
+			/>
 			<Footer />
 		</Container>
 	);

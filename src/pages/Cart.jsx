@@ -8,12 +8,10 @@ import { useDispatch, useSelector } from "react-redux";
 import StripeCheckout from "react-stripe-checkout";
 import { useState } from "react";
 import { useEffect } from "react";
-import { userRequest } from "../requestMethods";
+import { BASE_URL, userRequest } from "../requestMethods";
 import { useNavigate } from "react-router-dom";
 import { emptyCart } from "../redux/cartRedux";
-
-const STRIPE_KEY =
-	"pk_test_51MvzgdLzIZ7nqDD3yAzKLoqo37zAxj8JOwopdaqifdy7vWeFGM5jFaqaFx2QMSTqAEmb5v2eX84UDt93QQJOV3Xc00snhvKYic";
+import axios from "axios";
 
 const Container = styled.div``;
 
@@ -40,9 +38,14 @@ const TopButton = styled.button`
 	font-weight: 400;
 	cursor: pointer;
 	border: 1px solid #000;
-	border-radius: 5px;
 	background-color: #fff;
 	color: #000;
+	transition: all 0.3s ease;
+
+	&:hover {
+		background-color: #000;
+		color: #fff;
+	}
 `;
 
 const TopTexts = styled.div`
@@ -101,7 +104,9 @@ const Details = styled.div`
 	padding: 0px 20px;
 	display: flex;
 	flex-direction: column;
-	justify-content: space-around;
+	justify-content: start;
+	gap: 10px;
+	margin-bottom: 30px;
 
 	${mobile({
 		padding: "0px",
@@ -124,11 +129,13 @@ const ProductColor = styled.div`
 	background-color: ${(props) => props.color};
 `;
 const ProductSize = styled.span``;
+
 const PriceDetail = styled.div`
-	flex: 1;
+	/* flex: 1; */
+	padding: 0 20px;
 	display: flex;
-	align-items: center;
-	justify-content: center;
+	align-items: start;
+	justify-content: start;
 	flex-direction: column;
 `;
 
@@ -137,17 +144,13 @@ const ProductAmountContainer = styled.div`
 	align-items: center;
 	margin-bottom: 20px;
 `;
-const ProductAmount = styled.div`
-	font-size: 24px;
-	margin: 5px;
-
-	${mobile({
-		margin: "5px 15px",
-	})}
-`;
+const ProductAmount = styled.div``;
 const ProductPrice = styled.div`
 	font-size: 30px;
 	font-weight: 200;
+	background: #000;
+	color: #fff;
+	padding: 5px;
 
 	${mobile({
 		marginBottom: "20px",
@@ -162,59 +165,80 @@ const Hr = styled.hr`
 
 const Summary = styled.div`
 	flex: 1;
-	border: 0.5px solid lightgray;
-	border-radius: 10px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	border: 1px solid #000;
+	/* border-radius: 5px; */
 	padding: 20px;
 	height: 100%;
+	min-height: 340px;
+
+	${mobile({
+		minHeight: "0px",
+	})}
 `;
 const SummaryTitle = styled.h1`
 	font-weight: 200;
+	margin-bottom: 30px;
 `;
 const SummaryItem = styled.div`
-	margin: 30px 0px;
+	margin: 0px 0px 10px 0px;
 	display: flex;
 	justify-content: space-between;
 	font-weight: ${(props) => props.type === "total" && "500"};
 	font-size: ${(props) => props.type === "total" && "24px"};
+	margin-top: ${(props) => props.type === "total" && "30px"};
 `;
 const SummaryItemText = styled.div``;
 const SummaryItemPrice = styled.div``;
 const Button = styled.button`
 	width: 100%;
 	padding: 10px;
-	background-color: #000;
-	color: #fff;
-	font-weight: 500;
+	padding: 10px;
+	font-size: 20px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+
+	color: #000;
+	background: transparent;
+	border: 1px solid #000;
+
+	&:hover {
+		border: 1px solid #fff;
+		color: #fff;
+		background-color: #000;
+	}
 `;
 
 const Cart = () => {
-	console.log(STRIPE_KEY);
-
 	const cart = useSelector((state) => state.cart);
-	const [stripeToken, setStripeToken] = useState(null);
+	const user = useSelector((state) => state.user);
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
-	const onToken = (token) => {
-		setStripeToken(token);
+	const handleCheckout = () => {
+		axios
+			.post(`${BASE_URL}/checkout/payment`, {
+				products: cart.products,
+				user: user._id,
+			})
+			.then((res) => {
+				if (res.data.url) {
+					window.location.href = res.data.url;
+				}
+			})
+			.catch((err) => console.log(err.message));
 	};
-
-	useEffect(() => {
-		const makeRequest = async () => {
-			try {
-				const res = await userRequest.post("/checkout/payment", {
-					tokenId: stripeToken.id,
-					amount: cart.total * 100,
-				});
-				navigate("/success", { data: res.data });
-			} catch (err) {}
-		};
-		stripeToken && makeRequest();
-	}, [stripeToken, cart.total, navigate]);
 
 	const handleEmptyCart = () => {
 		dispatch(emptyCart());
 	};
+
+	const handleContinueShopping = () => {
+		navigate("/products");
+	};
+
 	return (
 		<Container>
 			{/* <Announcement /> */}
@@ -226,7 +250,9 @@ const Cart = () => {
 						<TopText>Shopping Bag(2)</TopText>
 						<TopText>Your Wishlist(0)</TopText>
 					</TopTexts> */}
-					<TopButton type="filled">Continue Shopping</TopButton>
+					<TopButton onClick={handleContinueShopping} type="filled">
+						Continue Shopping
+					</TopButton>
 					<TopButton onClick={handleEmptyCart}>Empty Cart</TopButton>
 				</Top>
 				<Bottom>
@@ -235,68 +261,81 @@ const Cart = () => {
 							<Product>
 								<ProductDetail>
 									<Image src={product.img} />
-									<Details>
-										<ProductName>
-											<b>Product:</b> {product.title}
-										</ProductName>
-										<ProductId>
-											<b>ID:</b>
-											{product._id}
-										</ProductId>
-										<ProductSize>
-											<b>Size:</b>
-											{product.size}
-										</ProductSize>
-									</Details>
+									<div
+										style={{
+											display: "flex",
+											flexDirection: "column",
+										}}
+									>
+										<Details>
+											<ProductName>
+												<b>Product:</b> {product.title}
+											</ProductName>
+											<ProductId>
+												<b>ID:</b> {product._id}
+											</ProductId>
+											<ProductSize>
+												<b>Size:</b> {product.size}
+											</ProductSize>
+											<ProductAmount>
+												<b>Quantity:</b>{" "}
+												{product.quantity}
+											</ProductAmount>
+										</Details>
+										<PriceDetail>
+											{/* <ProductAmountContainer>
+												<Remove />
+												
+												<Add />
+											</ProductAmountContainer> */}
+											<ProductPrice>
+												₴{" "}
+												{parseInt(product.price) *
+													product.quantity}
+											</ProductPrice>
+										</PriceDetail>
+									</div>
 								</ProductDetail>
-								<PriceDetail>
-									<ProductAmountContainer>
-										<Remove />
-										<ProductAmount>
-											{product.quantity}
-										</ProductAmount>
-										<Add />
-									</ProductAmountContainer>
-									<ProductPrice>
-										₴{" "}
-										{parseInt(product.price) *
-											product.quantity}
-									</ProductPrice>
-								</PriceDetail>
+
 								<Hr />
 							</Product>
 						))}
 					</Info>
 					<Summary>
-						<SummaryTitle>ORDER SUMMARY</SummaryTitle>
-						<SummaryItem>
-							<SummaryItemText>Subtotal</SummaryItemText>
-							<SummaryItemPrice>₴ {cart.total}</SummaryItemPrice>
-						</SummaryItem>
+						<div>
+							<SummaryTitle>ORDER SUMMARY</SummaryTitle>
+							<div>
+								<SummaryItem>
+									<SummaryItemText>Subtotal</SummaryItemText>
+									<SummaryItemPrice>
+										₴ {cart.total}
+									</SummaryItemPrice>
+								</SummaryItem>
 
-						<SummaryItem>
-							<SummaryItemText>
-								Estimated Shipping
-							</SummaryItemText>
-							<SummaryItemPrice>₴ 100</SummaryItemPrice>
-						</SummaryItem>
+								<SummaryItem>
+									<SummaryItemText>
+										Estimated Shipping
+									</SummaryItemText>
+									<SummaryItemPrice>₴ 100</SummaryItemPrice>
+								</SummaryItem>
 
-						<SummaryItem type="total">
-							<SummaryItemText>Total</SummaryItemText>
-							<SummaryItemPrice>₴ {cart.total}</SummaryItemPrice>
-						</SummaryItem>
-						<StripeCheckout
-							name="Step"
-							image="https://i.ibb.co/q5VsSMq/logo.png"
-							shippingAddress
-							billingAddress
-							description={`Your total is ₴${cart.total}`}
-							amount={cart.total * 100}
-							token={onToken}
-							stripeKey={STRIPE_KEY}
-						>
-							<Button>CHECKOUT NOW</Button>
-						</StripeCheckout>
+								<SummaryItem>
+									<SummaryItemText>
+										Shipping Discout
+									</SummaryItemText>
+									<SummaryItemPrice>₴ -100</SummaryItemPrice>
+								</SummaryItem>
+
+								<SummaryItem type="total">
+									<SummaryItemText>Total</SummaryItemText>
+									<SummaryItemPrice>
+										₴ {cart.total}
+									</SummaryItemPrice>
+								</SummaryItem>
+							</div>
+						</div>
+
+						<Button onClick={handleCheckout}>CHECKOUT NOW</Button>
 					</Summary>
 				</Bottom>
 			</Wrapper>

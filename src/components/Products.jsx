@@ -16,24 +16,30 @@ const Container = styled.div`
 	})}
 `;
 
-const Products = ({ category, filters, sort }) => {
+const Products = ({ category, filters, sort, searchTerm, latest }) => {
 	const [products, setProducts] = useState([]);
 	const [filteredProducts, setFilteredProducts] = useState([]);
 
 	useEffect(() => {
 		const getProducts = async () => {
 			try {
-				const res = await axios.get(
-					category
-						? `${BASE_URL}/products?category=${category}`
-						: `${BASE_URL}/products`
-				);
+				let url = category
+					? `${BASE_URL}/products/?category=${category}`
+					: `${BASE_URL}/products`;
+
+				if (searchTerm) {
+					url += `/?search=${searchTerm}`;
+				}
+
+				if (latest) url = `${BASE_URL}/products/?new=8`;
+
+				const res = await axios.get(url);
 				setProducts(res.data);
 				console.log(res.data);
 			} catch (err) {}
 		};
 		getProducts();
-	}, [category]);
+	}, [category, searchTerm, latest]);
 
 	useEffect(() => {
 		category &&
@@ -68,9 +74,7 @@ const Products = ({ category, filters, sort }) => {
 				? filteredProducts.map((item) => (
 						<Product item={item} key={item.id} />
 				  ))
-				: products
-						.slice(0, 8)
-						.map((item) => <Product item={item} key={item.id} />)}
+				: products.map((item) => <Product item={item} key={item.id} />)}
 		</Container>
 	);
 };

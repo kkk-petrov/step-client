@@ -48,7 +48,6 @@ const Container = styled.div`
 	position: relative;
 	border-radius: 5px;
 	overflow: hidden;
-
 	&:hover ${Info} {
 		opacity: 1;
 	}
@@ -85,6 +84,7 @@ const Product = ({ item }) => {
 	const dispatch = useDispatch();
 
 	const handleAddToCart = () => {
+		console.log(!item, item, item.size, item.size[0]);
 		const product = { ...item, quantity: 1, size: item.size[0] };
 		dispatch(addProduct(product));
 		console.log(product);

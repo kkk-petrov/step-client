@@ -14,6 +14,8 @@ const Container = styled.div`
 	/* padding: 0 0 100px 0; */
 `;
 const Wrapper = styled.div`
+	height: 100vh;
+
 	padding: 50px;
 	display: flex;
 	${mobile({
@@ -30,8 +32,7 @@ const Image = styled.img`
 	/* height: 100%; */
 	object-fit: cover;
 	transform: scaleX(-1);
-	align-self: flex-end;
-	margin-bottom: -6px;
+	align-self: flex-start;
 `;
 const InfoContainer = styled.div`
 	flex: 1;
@@ -45,6 +46,7 @@ const Title = styled.h1`
 `;
 const Desc = styled.p`
 	margin: 20px 0px;
+	font-size: 16px;
 `;
 const Price = styled.span`
 	font-weight: 100;
@@ -110,15 +112,16 @@ const Amount = styled.span`
 `;
 const Button = styled.button`
 	padding: 15px;
-	border: 1px solid teal;
-	background-color: white;
+	border: 1px solid #000;
+	background: transparent;
+	color: #000;
 	cursor: pointer;
 	font-weight: 500;
 	transition: all 0.3s ease;
 
 	&:hover {
-		background-color: teal;
-		color: white;
+		background-color: #000;
+		color: #fff;
 	}
 `;
 
@@ -127,7 +130,7 @@ const Product = () => {
 	const id = location.pathname.split("/")[2];
 	const [product, setProduct] = useState({});
 	const [quantity, setQuantity] = useState(1);
-	const [size, setSize] = useState("");
+	const [size, setSize] = useState(0);
 	const dispatch = useDispatch();
 
 	const handleQuantity = (type) => {
@@ -139,8 +142,14 @@ const Product = () => {
 	};
 
 	const handleButton = () => {
-		size === "" && setSize(product?.size[0]);
-		dispatch(addProduct({ ...product, quantity, size }));
+		console.log(size, !size, product, product.size, product.size[0]);
+		dispatch(
+			addProduct({
+				...product,
+				quantity,
+				size: !size ? product.size[0] : size,
+			})
+		);
 	};
 
 	const handleSize = (event) => {
@@ -172,7 +181,18 @@ const Product = () => {
 				</ImgContainer>
 				<InfoContainer>
 					<Title>{product.title}</Title>
-					<Desc>{product.desc}</Desc>
+					<Desc>
+						{product.desc}
+						<br />
+						<br />
+						<>
+							Ми пропонуємо виключно оригінальну продукцію з
+							Європи і США, яку доставляємо по всій Україні.
+							Завдяки прямим поставкам від виробника, ми можемо
+							гарантувати, що купуючи у нас, ви отримуєте
+							оригінальну модель.
+						</>
+					</Desc>
 					<Price>₴ {product.price}</Price>
 					<FilterContainer>
 						{/* <Filter>
@@ -198,15 +218,20 @@ const Product = () => {
 					</FilterContainer>
 					<AddContainer>
 						<AmountContainer>
-							<Remove onClick={() => handleQuantity("dec")} />
+							<Remove
+								style={{ cursor: "pointer" }}
+								onClick={() => handleQuantity("dec")}
+							/>
 							<Amount>{quantity}</Amount>
-							<Add onClick={() => handleQuantity("inc")} />
+							<Add
+								style={{ cursor: "pointer" }}
+								onClick={() => handleQuantity("inc")}
+							/>
 						</AmountContainer>
 						<Button onClick={handleButton}>ADD TO CART</Button>
 					</AddContainer>
 				</InfoContainer>
 			</Wrapper>
-			<Newsletter />
 			<Footer />
 		</Container>
 	);

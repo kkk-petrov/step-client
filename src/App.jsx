@@ -13,6 +13,7 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Cart from "./pages/Cart";
 import Success from "./pages/Success";
+import Profile from "./pages/Profile";
 
 // import { router } from "./routing";
 
@@ -43,6 +44,10 @@ const App = () => {
 		{
 			path: "/login",
 			element: user ? <Navigate replace to="/" /> : <Login />,
+		},
+		{
+			path: "/profile",
+			element: !user ? <Navigate replace to="/" /> : <Profile />,
 		},
 		{
 			path: "/cart",

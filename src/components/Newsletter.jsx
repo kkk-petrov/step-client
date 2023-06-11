@@ -1,23 +1,11 @@
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 import { Send } from "@material-ui/icons";
 import { mobile } from "../responsive";
 import { useState } from "react";
 
-const AlertAnimation = keyframes`
-	0%{
-		opacity: 1;
-	}
-	80%{
-		opacity:0;
-	}
-	100%{
-		display:none;
-	}
-`;
-
-const Container = styled.div`
+const NewsletterContainer = styled.div`
 	height: 60vh;
-	background-color: #fcf5f5;
+	background-color: #f8f8f8;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -30,22 +18,22 @@ const Title = styled.h2`
 const Desc = styled.p`
 	font-size: 24px;
 	font-weight: 300;
-	margin-bottom: 20px;
+	margin-bottom: 40px;
 
 	${mobile({
 		textAlign: "center",
 	})}
 `;
-const InputContainer = styled.div`
+const InputNewsletterContainer = styled.div`
 	width: 50%;
 	height: 40px;
-	background-color: #fff;
+	background-color: #f8f8f8;
 	display: flex;
 	justify-content: space-between;
-	border: 1px solid #fff;
+	border: 1px solid #000;
 
 	&::placeholder {
-		color: #bdbdbd;
+		color: #000;
 	}
 
 	${mobile({
@@ -53,9 +41,11 @@ const InputContainer = styled.div`
 	})}
 `;
 const Input = styled.input`
-	border: none;
 	flex: 8;
 	padding-left: 20px;
+	border: none;
+	border-right: none;
+	background-color: #f8f8f8;
 
 	&:focus-visible {
 		outline: none;
@@ -63,24 +53,12 @@ const Input = styled.input`
 `;
 const Button = styled.button`
 	flex: 1;
-	border: none;
-	background-color: teal;
+	background: #000;
 	color: #fff;
 	cursor: pointer;
-`;
-
-const Alert = styled.div`
-	display: block;
-	height: 50px;
-	width: 150px;
-	position: absolute;
-	top: 0px;
-	left: 0px;
-	background-color: rgba(6, 241, 226, 0.81);
-	color: #03d0ff;
 	transition: all 0.3s ease;
-	opacity: 1;
-	animation: ${AlertAnimation} 10s;
+	border: none;
+	border-left: 1px solid #000;
 `;
 
 const Newsletter = () => {
@@ -89,17 +67,16 @@ const Newsletter = () => {
 		alert("OK");
 	};
 	return (
-		<Container>
-			<Title>Newsletter</Title>
-			<Desc>Get timely upadates from your favorite products.</Desc>
-			<InputContainer>
+		<NewsletterContainer>
+			{/* <Title>Newsletter</Title> */}
+			<Desc>Get timely updates from your favorite products.</Desc>
+			<InputNewsletterContainer>
 				<Input placeholder="Your email" />
 				<Button onClick={handleAlert}>
 					<Send />
 				</Button>
-				<Alert>OKOKOK!!!</Alert>
-			</InputContainer>
-		</Container>
+			</InputNewsletterContainer>
+		</NewsletterContainer>
 	);
 };
 
