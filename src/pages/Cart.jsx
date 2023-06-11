@@ -9,7 +9,7 @@ import StripeCheckout from "react-stripe-checkout";
 import { useState } from "react";
 import { useEffect } from "react";
 import { BASE_URL, userRequest } from "../requestMethods";
-import { useNavigate } from "react-router-dom";
+import { ScrollRestoration, useNavigate } from "react-router-dom";
 import { emptyCart } from "../redux/cartRedux";
 import axios from "axios";
 
@@ -241,6 +241,8 @@ const Cart = () => {
 
 	return (
 		<Container>
+			<ScrollRestoration />
+
 			{/* <Announcement /> */}
 			<Navbar />
 			<Wrapper>
